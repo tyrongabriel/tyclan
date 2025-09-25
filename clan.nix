@@ -6,10 +6,29 @@
   inventory.machines = {
     # Define machines here.
     # jon = { };
+    ltc01 = { };
   };
 
   # Docs: See https://docs.clan.lol/reference/clanServices
   inventory.instances = {
+    # Docs: https://docs.clan.lol/guides/getting-started/add-user/
+    tyron-user = {
+      module.name = "users";
+
+      roles.default.tags.all = { }; # Adds to ALL machines
+
+      roles.default.settings = {
+        user = "tyron";
+        groups = [
+          "wheel" # Allow using 'sudo'
+          "networkmanager" # Allows to manage network connections.
+          "video" # Allows to access video devices.
+          "input" # Allows to access input devices.
+        ];
+        share = true; # Share the password of the user across machines (wont be reprompted!)
+      };
+      roles.default.extraModules = [ ./users/tyron/home.nix ];
+    };
 
     # Docs: https://docs.clan.lol/reference/clanServices/admin/
     # Admin service for managing machines
