@@ -1,6 +1,7 @@
 {
   # Ensure this is unique among all clans you want to use.
-  meta.name = "__CHANGE_ME__";
+  meta.name = "tyclan";
+  meta.description = "Tyron's Clan";
 
   inventory.machines = {
     # Define machines here.
