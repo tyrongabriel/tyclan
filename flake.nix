@@ -20,6 +20,8 @@
   outputs =
     inputs@{
       flake-parts,
+      nixpkgs-25_05,
+      nixpkgs-unstable,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -31,51 +33,45 @@
       ];
       imports = [
         inputs.clan-core.flakeModules.default
+        # Nixpkgs overlays https://flake.parts/overlays
+        #inputs.flake-parts.flakeModules.easyOverlay
+        #./templates/flake-module.nix
+        #flake-parts.flakeModules.modules
+        ./parts/clan.nix
+        ./parts/devshells.nix
       ];
 
       # https://docs.clan.lol/guides/getting-started/flake-parts/
-      clan = {
-        specialArgs = {
-          pkgs-unstable = inputs.nixpkgs-unstable;
-          pkgs-25_05 = inputs.nixpkgs-25_05;
+      # clan = {
+      #   specialArgs = {
+      #     # Added to each system
+      #     inherit inputs;
+      #   };
+      #   imports = [
+      #     ./clan.nix
+      #   ];
+      # };
 
-        };
-        imports = [ ./clan.nix ];
-      };
-
-      perSystem =
-        {
-          pkgs,
-          inputs',
-          system,
-          ...
-        }:
-        {
-          devShells.default = pkgs.mkShell { packages = [ inputs'.clan-core.packages.clan-cli ]; };
-          _module.args.pkgs = import inputs.nixpkgs {
-            inherit system;
-            overlays = [
-              #inputs.foo.overlays.default
-              # (final: prev: {
-              #   # ... things you need to patch ...
-              # })
-              (final: prev: {
-                v25_05 = import inputs.nixpkgs-25_05 {
-                  inherit (prev) system;
-                  config = {
-                    allowUnfree = true;
-                  };
-                };
-                unstable = import inputs.nixpkgs-unstable {
-                  inherit (prev) system;
-                  config = {
-                    allowUnfree = true;
-                  };
-                };
-              })
-            ];
-            config = { };
-          };
-        };
+      # perSystem =
+      #   {
+      #     pkgs,
+      #     inputs',
+      #     system,
+      #     ...
+      #   }:
+      #   {
+      #     devShells.default = pkgs.mkShell { packages = [ inputs'.clan-core.packages.clan-cli ]; };
+      #     # _module.args = {
+      #     #   # "ExtraSpecialArgs" but not clan-native
+      #     #   pkgs-unstable = import inputs'.nixpkgs-unstable {
+      #     #     inherit system;
+      #     #     config.allowUnfree = true;
+      #     #   };
+      #     #   pkgs-25_05 = import inputs'.nixpkgs-25_05 {
+      #     #     inherit system;
+      #     #     config.allowUnfree = true;
+      #     #   };
+      #     # };
+      #   };
     };
 }

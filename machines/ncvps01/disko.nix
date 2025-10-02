@@ -1,45 +1,97 @@
-# ---
-# schema = "single-disk"
-# [placeholders]
-# mainDisk = "/dev/disk/by-path/pci-0000:00:10.0" 
-# ---
-# This file was automatically generated!
-# CHANGING this configuration requires wiping and reinstalling the machine
+{ lib, ... }:
 {
+  ## Boot Config ##
+  boot = {
+    #kernelPackages = pkgs.linuxPackages_latest;
+    supportedFilesystems = lib.mkForce [ "btrfs" ]; # Force support for my used filesystem
 
-  boot.loader.grub.efiSupport = true;
-  boot.loader.grub.efiInstallAsRemovable = true;
-  boot.loader.grub.enable = true;
+    ## Bootloader ##
+    # TODO: Fit into a module!
+    loader.grub = {
+      # no need to set devices, disko will add all devices that have a EF02 partition to the list already
+      # devices = [ ];
+      # device = "nodev"; # No specific partition
+      # useOSProber = true; # Autodetect windows
+      efiSupport = true;
+      efiInstallAsRemovable = true;
+    };
+  };
+
   disko.devices = {
     disk = {
-      main = {
-        name = "main-67f609abba5b4d00b145d5c5989124c5";
-        device = "/dev/disk/by-path/pci-0000:00:10.0";
+      sda = {
         type = "disk";
+        # The storage device
+        device = "/dev/vda";
         content = {
           type = "gpt";
           partitions = {
-            "boot" = {
+            boot = {
+              name = "boot";
               size = "1M";
-              type = "EF02"; # for grub MBR
-              priority = 1;
+              type = "EF02";
             };
+            # Boot Partition
             ESP = {
+              label = "boot";
+              name = "ESP";
+              size = "1G";
               type = "EF00";
-              size = "500M";
               content = {
                 type = "filesystem";
                 format = "vfat";
                 mountpoint = "/boot";
-                mountOptions = [ "umask=0077" ];
+                mountOptions = [ "defaults" ];
               };
             };
+            # Root partition (In the future, impermanent!)
             root = {
               size = "100%";
               content = {
-                type = "filesystem";
-                format = "ext4";
-                mountpoint = "/";
+                type = "btrfs";
+                extraArgs = [
+                  "-L"
+                  "nixos"
+                  "-f"
+                ]; # Label it nixos
+                subvolumes = {
+                  "/root" = {
+                    mountpoint = "/";
+                    mountOptions = [
+                      "subvol=root"
+                      "compress=zstd"
+                      "noatime"
+                    ];
+                  };
+                  "/home" = {
+                    mountpoint = "/home";
+                    mountOptions = [
+                      "subvol=home"
+                      "compress=zstd"
+                      "noatime"
+                    ];
+                  };
+                  "/nix" = {
+                    mountpoint = "/nix";
+                    mountOptions = [
+                      "subvol=nix"
+                      "compress=zstd"
+                      "noatime"
+                    ];
+                  };
+                  "/log" = {
+                    mountpoint = "/var/log";
+                    mountOptions = [
+                      "subvol=log"
+                      "compress=zstd"
+                      "noatime"
+                    ];
+                  };
+                  "/swap" = {
+                    mountpoint = "/swap";
+                    swap.swapfile.size = "8G";
+                  };
+                };
               };
             };
           };
@@ -47,4 +99,6 @@
       };
     };
   };
+
+  fileSystems."/var/log".neededForBoot = true;
 }

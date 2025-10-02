@@ -3,10 +3,21 @@
   meta.name = "tyclan";
   meta.description = "Tyron's Clan";
 
+  # templates = {
+  #   disko = {
+  #     uefi-8g-swap = {
+  #       description = "A simple disk with UEFI boot and 8GB swap";
+  #       path = ./templates/disk/uefi-8g-single-disk;
+  #     };
+  #   };
+  # };
+
   inventory.machines = {
     # Define machines here.
     # jon = { };
-    ltc01 = { };
+    ncvps01 = {
+      deploy.targetHost = "root@152.53.149.109";
+    };
   };
 
   # Docs: See https://docs.clan.lol/reference/clanServices
@@ -27,7 +38,7 @@
         ];
         share = true; # Share the password of the user across machines (wont be reprompted!)
       };
-      roles.default.extraModules = [ ./users/tyron/home.nix ];
+      # roles.default.extraModules = [ ./users/tyron/home.nix ];
     };
 
     # Docs: https://docs.clan.lol/reference/clanServices/admin/
@@ -39,7 +50,8 @@
         # Insert the public key that you want to use for SSH access.
         # All keys will have ssh access to all machines ("tags.all" means 'all machines').
         # Alternatively set 'users.users.root.openssh.authorizedKeys.keys' in each machine
-        "admin-machine-1" = "__YOUR_PUBLIC_KEY__";
+        "admin-yoga" =
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEqAq3GCuNXFc8mQL+H/czF0+pOlyQ4c4GILKUcrK0fZ 51530686+tyrongabriel@users.noreply.github.com";
       };
     };
 
@@ -52,7 +64,7 @@
       # Replace with the name (string) of your machine that you will use as zerotier-controller
       # See: https://docs.zerotier.com/controller/
       # Deploy this machine first to create the network secrets
-      roles.controller.machines."__YOUR_CONTROLLER__" = { };
+      roles.controller.machines."ltc01" = { };
       # Peers of the network
       # tags.all means 'all machines' will joined
       roles.peer.tags.all = { };
@@ -61,9 +73,9 @@
     # Docs: https://docs.clan.lol/reference/clanServices/tor/
     # Tor network provides secure, anonymous connections to your machines
     # All machines will be accessible via Tor as a fallback connection method
-    tor = {
-      roles.server.tags.nixos = { };
-    };
+    # tor = {
+    #   roles.server.tags.nixos = { };
+    # };
   };
 
   # Additional NixOS configuration can be added here.
