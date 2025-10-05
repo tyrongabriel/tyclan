@@ -9,6 +9,7 @@ let
       inherit lib;
     };
     k3s = import ./k3s.nix { inherit inputs; };
+    tailscale = import ./tailscale.nix { inherit inputs; };
   };
 in
 lib.foldr lib.recursiveUpdate { } (lib.attrValues services)

@@ -16,6 +16,11 @@
               default = 6443;
               description = "The port on which the haproxy server will listen for API requests";
             };
+            tailscaleInstanceName = mkOption {
+              type = types.str;
+              default = "tailscale-net";
+              description = "The name of the tailscale instance (clan inventory) to use for this server";
+            };
           };
         };
       perInstance =
@@ -31,6 +36,11 @@
           nixosModule =
             { config, ... }:
             let
+              machineIpPath = (
+                machineName:
+                "${config.clan.core.settings.directory}/vars/per-machine/${machineName}/tailscale-${settings.tailscaleInstanceName}-ip/tailscale-ipv4/value"
+              );
+
               # Stolen from the core zerotier module
 
               #uniqueStrings = list: builtins.attrNames (builtins.groupBy lib.id list);
@@ -41,16 +51,12 @@
               }) roles.server.machines;
               servers = builtins.foldl' (
                 ips: machine:
-                if
-                  builtins.pathExists "${config.clan.core.settings.directory}/vars/per-machine/${machine.name}/zerotier/zerotier-ip/value"
-                then
+                if builtins.pathExists (machineIpPath machine.name) then
                   ips
                   ++ [
                     {
                       name = machine.name;
-                      ip = (
-                        builtins.readFile "${config.clan.core.settings.directory}/vars/per-machine/${machine.name}/zerotier/zerotier-ip/value"
-                      );
+                      ip = (builtins.readFile (machineIpPath machine.name));
                       settings = machine.settings;
                     }
                   ]
@@ -60,7 +66,7 @@
 
               ## For HA PROXY ##
               generateBackendServers = map (
-                server: "    server ${server.name} [${server.ip}]:${toString server.settings.k3sApiPort} check"
+                server: "    server ${server.name} ${server.ip}:${toString server.settings.k3sApiPort} check"
               ) servers;
 
               backendServersString = lib.concatStringsSep "\n" generateBackendServers;
@@ -94,7 +100,7 @@
                       # This 'bind' line enables listening on ALL IPv6 interfaces on port 80.
                       # If you want dual-stack (IPv4 & IPv6), you might use 'bind *:80'
                       # but '[::]:80' with the 'v6only' option is often safer for pure IPv6.
-                      bind [::]:${toString settings.haproxyApiPort} v6only
+                      bind *:${toString settings.haproxyApiPort}
                       default_backend machine_backend
 
                   # Backend configuration
@@ -135,7 +141,7 @@
             };
             k3sApiAddress = mkOption {
               type = types.str;
-              default = "::"; # Default ipv6
+              default = "0.0.0.0"; # Default ipv4 all interfaces
               description = "The address on which the k3s server will listen for API requests";
             };
             clusterInit = mkOption {
@@ -167,6 +173,11 @@
               };
               description = "The port range to use for service node ports. Only valid when serviceCIDR is set.";
             };
+            tailscaleInstanceName = mkOption {
+              type = types.str;
+              default = "tailscale-net";
+              description = "The name of the tailscale instance (clan inventory) to use for this server";
+            };
           };
         };
       perInstance =
@@ -182,6 +193,15 @@
           nixosModule =
             { lib, config, ... }:
             let
+              ipPath = (
+                machineName:
+                "${config.clan.core.settings.directory}/vars/per-machine/${machineName}/tailscale-${settings.tailscaleInstanceName}-ip/tailscale-ipv4/value"
+              );
+              getTailscaleIP = (
+                machineName:
+                if (builtins.pathExists (ipPath machineName)) then (builtins.readFile (ipPath machineName)) else ""
+              );
+
               ### Fetch token ###
               generatorName = "k3s-token-${instanceName}";
               token_file =
@@ -189,40 +209,22 @@
                   config.clan.core.vars.generators."${generatorName}".files.token_file.path;
 
               ### Fetch current machine info ###
-              currentMachineIp =
-                if
-                  builtins.pathExists "${config.clan.core.settings.directory}/vars/per-machine/${machine.name}/zerotier/zerotier-ip/value"
-                then
-                  builtins.readFile "${config.clan.core.settings.directory}/vars/per-machine/${machine.name}/zerotier/zerotier-ip/value"
-                else
-                  throw;
+              currentMachineIp = getTailscaleIP machine.name;
 
               ### Fetch loadbalancer info ###
               loadBalancerName = lib.head (lib.attrNames roles.serverLoadBalancer.machines);
               loadBalancerPort = roles.serverLoadBalancer.machines."${loadBalancerName}".settings.haproxyApiPort;
-              loadBalancerIp =
-                if
-                  builtins.pathExists "${config.clan.core.settings.directory}/vars/per-machine/${loadBalancerName}/zerotier/zerotier-ip/value"
-                then
-                  builtins.readFile "${config.clan.core.settings.directory}/vars/per-machine/${loadBalancerName}/zerotier/zerotier-ip/value"
-                else
-                  throw;
+              loadBalancerIp = getTailscaleIP loadBalancerName;
 
               ### Fetch cluster initializer ###
-              clusterInitMachineName = lib.head (
-                lib.attrNames (
-                  lib.attrsets.filterAttrs (name: value: value.settings.clusterInit) roles.server.machines
-                )
-                #++ [ "ncvps01" ] # Default to ncvps01 if no other server is found (used for testing)
-              );
-              clusterInitPort = roles.server.machines."${clusterInitMachineName}".settings.k3sApiPort;
-              clusterInitIp =
-                if
-                  builtins.pathExists "${config.clan.core.settings.directory}/vars/per-machine/${machine.name}/zerotier/zerotier-ip/value"
-                then
-                  builtins.readFile "${config.clan.core.settings.directory}/vars/per-machine/${machine.name}/zerotier/zerotier-ip/value"
-                else
-                  throw;
+              # clusterInitMachineName = lib.head (
+              #   lib.attrNames (
+              #     lib.attrsets.filterAttrs (name: value: value.settings.clusterInit) roles.server.machines
+              #   )
+              #   #++ [ "ncvps01" ] # Default to ncvps01 if no other server is found (used for testing)
+              # );
+              #clusterInitPort = roles.server.machines."${clusterInitMachineName}".settings.k3sApiPort;
+              #clusterInitIp = getTailscaleIP clusterInitMachineName;
 
             in
             {
@@ -243,11 +245,7 @@
 
                   "--node-external-ip=${currentMachineIp}" # For etcd to choose correct ip?
                   "--node-ip=${currentMachineIp}" # For etcd to choose correct ip?
-                  "--advertise-address=${settings.k3sApiAddress}"
-                  "--cluster-cidr 2001:db8:42::/56"
-                  "--service-cidr 2001:db8:43::/112"
-                  "--flannel-ipv6-masq"
-                  #
+                  "--advertise-address=${loadBalancerIp}" # ${currentMachineIp}" # ${settings.k3sApiAddress}"
                   #"--etcd-arg=--listen-peer-urls=https://[${currentMachineIp}]:2380"
                   #"--etcd-arg=--listen-client-urls=https://[${currentMachineIp}]:2379"
 
@@ -286,13 +284,18 @@
             };
             k3sApiAddress = mkOption {
               type = types.str;
-              default = "::"; # Default ipv6
+              default = "0.0.0.0"; # Default ipv4, all interfaces
               description = "The address on which the k3s agent will listen for API requests";
             };
             extraFlags = mkOption {
               type = types.listOf types.str;
               default = [ ];
               description = "Extra flags to pass to k3s agent";
+            };
+            tailscaleInstanceName = mkOption {
+              type = types.str;
+              default = "tailscale-net";
+              description = "The name of the tailscale instance (clan inventory) to use for this server";
             };
           };
         };
@@ -308,6 +311,14 @@
           nixosModule =
             { lib, config, ... }:
             let
+              ipPath = (
+                machineName:
+                "${config.clan.core.settings.directory}/vars/per-machine/${machineName}/tailscale-${settings.tailscaleInstanceName}-ip/tailscale-ipv4/value"
+              );
+              getTailscaleIP = (
+                machineName:
+                if (builtins.pathExists (ipPath machineName)) then (builtins.readFile (ipPath machineName)) else ""
+              );
               ### Fetch token ###
               generatorName = "k3s-token-${instanceName}";
               token_file =
@@ -317,13 +328,7 @@
               ### Fetch loadbalancer info ###
               loadBalancerName = lib.head (lib.attrNames roles.serverLoadBalancer.machines);
               loadBalancerPort = roles.serverLoadBalancer.machines."${loadBalancerName}".settings.haproxyApiPort;
-              loadBalancerIp =
-                if
-                  builtins.pathExists "${config.clan.core.settings.directory}/vars/per-machine/${loadBalancerName}/zerotier/zerotier-ip/value"
-                then
-                  builtins.readFile "${config.clan.core.settings.directory}/vars/per-machine/${loadBalancerName}/zerotier/zerotier-ip/value"
-                else
-                  throw;
+              loadBalancerIp = getTailscaleIP loadBalancerName;
 
               ### Check whether this machine is initial server ###
               isInitialServer =

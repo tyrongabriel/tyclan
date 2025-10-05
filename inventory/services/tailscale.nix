@@ -3,6 +3,9 @@ _: {
     module.name = "@tyclan/tailscale";
     module.input = "self";
 
-    roles.peer.tags.all = { };
+    roles.peer = {
+      settings.enableSSH = false; # No root login!
+      tags.all = { };
+    };
   };
 }

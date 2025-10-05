@@ -26,8 +26,29 @@ _: {
       };
 
     perInstance =
-      { instanceName, settings, ... }:
       {
+        instanceName,
+        settings,
+        roles,
+        lib,
+        machine,
+        ...
+      }:
+      let
+        generatorName = "tailscale-${instanceName}";
+      in
+      {
+        exports.networking = {
+          priority = lib.mkDefault 950;
+          # TODO add user space network support to clan-cli
+          peers = lib.mapAttrs (name: _machine: {
+            host.var = {
+              machine = name;
+              generator = "${generatorName}-ip";
+              file = "tailscale-ipv4";
+            };
+          }) roles.peer.machines;
+        };
         nixosModule =
           {
             config,
@@ -36,8 +57,6 @@ _: {
             ...
           }:
           let
-            generatorName = "tailscale-${instanceName}";
-
             enableHostAliases = settings.enableHostAliases or true;
             enableSSH = settings.enableSSH or false;
             exitNode = settings.exitNode or false;
@@ -60,6 +79,7 @@ _: {
           in
           {
             imports = [ ./host-sync.nix ];
+            warnings = lib.lists.optional settings.enableSSH "Tailscale ssh enabled for ${machine.name}, allows root login!";
 
             clan.core.vars.generators."${generatorName}" = {
               share = true;
@@ -75,6 +95,42 @@ _: {
               script = ''
                 cat "$prompts"/auth_key > "$out"/auth_key
               '';
+            };
+
+            clan.core.vars.generators."${generatorName}-ip" = {
+              share = false; # At the very least does not work with clan networking! as each network has one generator, but share would need one per machine.
+              files.tailscale-ipv4 = {
+                secret = false;
+              };
+              files.tailscale-ipv6 = {
+                secret = false;
+              };
+              runtimeInputs = [ pkgs.coreutils ];
+
+              prompts.tailscale-ipv4 = {
+                description = "Tailscale ipv4 address for instance '${instanceName}' and machine '${machine.name}'";
+                type = "line";
+                persist = false;
+              };
+
+              prompts.tailscale-ipv6 = {
+                description = "Tailscale ipv6 address for instance '${instanceName}' and machine '${machine.name}'";
+                type = "line";
+                persist = false;
+              };
+
+              ## Not needed with persist
+              script = ''
+                cat $prompts/tailscale-ipv4 > "$out"/tailscale-ipv4 &&
+                cat $prompts/tailscale-ipv6 > "$out"/tailscale-ipv6
+              '';
+
+              #runtimeInputs = [ pkgs.tailscale ];
+
+              # script = ''
+              #   tailscale ip -4 | head -n1 > "$out"/tailscale-ipv4 &&
+              #   tailscale ip -6 | head -n1 > "$out"/tailscale-ipv6
+              # '';
             };
 
             services.tailscale = finalSettings // {
