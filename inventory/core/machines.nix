@@ -6,7 +6,15 @@ _: {
       ];
       #deploy.targetHost = "tyron@152.53.149.109";
     };
-    ltc01 = { };
-    hp01 = { };
+    ltc01 = {
+      tags = [
+        "k3s"
+      ];
+    };
+    hp01 = {
+      tags = [
+        "k3s"
+      ];
+    };
   };
 }

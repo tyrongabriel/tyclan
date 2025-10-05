@@ -7,13 +7,18 @@
       # Deploy this machine first to create the network secrets
       roles.controller = {
         extraModules = [
-          ./zerotier-modules/default.nix
+          # ./zerotier-modules/default.nix
         ];
         machines."ncvps01" = { };
       };
       # Peers of the network
       # tags.all means 'all machines' will joined
-      roles.peer.tags.all = { };
+      roles.peer = {
+        extraModules = [
+          # ./zerotier-modules/secret-ipv4.nix
+        ];
+        tags.all = { };
+      };
     };
   };
 }

@@ -115,7 +115,7 @@
                       # Set a username and password for access (optional but recommended)
                       stats auth admin:securepassword
                       stats refresh 10s
-                '';
+                ''; # UPDATE TO USE SECRET FOR PASSWD!!
               };
             };
         };
@@ -188,6 +188,15 @@
                 lib.mkDefault
                   config.clan.core.vars.generators."${generatorName}".files.token_file.path;
 
+              ### Fetch current machine info ###
+              currentMachineIp =
+                if
+                  builtins.pathExists "${config.clan.core.settings.directory}/vars/per-machine/${machine.name}/zerotier/zerotier-ip/value"
+                then
+                  builtins.readFile "${config.clan.core.settings.directory}/vars/per-machine/${machine.name}/zerotier/zerotier-ip/value"
+                else
+                  throw;
+
               ### Fetch loadbalancer info ###
               loadBalancerName = lib.head (lib.attrNames roles.serverLoadBalancer.machines);
               loadBalancerPort = roles.serverLoadBalancer.machines."${loadBalancerName}".settings.haproxyApiPort;
@@ -223,17 +232,34 @@
                 disableAgent = if lib.lists.any (role: role == "agent") machine.roles then false else true; # Disable k3s agent, if also agent then it will not be disabled
                 tokenFile = token_file;
                 serverAddr = lib.mkIf (!settings.clusterInit) (
-                  lib.mkForce "https://${clusterInitIp}:${toString clusterInitPort}"
+                  lib.mkForce "https://${loadBalancerIp}:${toString loadBalancerPort}"
                 );
                 extraFlags = [
                   # Initialize a new cluster (use this only on the first server)
                   "--tls-san=${loadBalancerIp}" # Alternate certificate SAN so that the load balancer has correct cert
-                  "--bind-address=${settings.k3sApiAddress}"
+                  "--bind-address=${currentMachineIp}"
                   "--https-listen-port=${toString settings.k3sApiPort}"
                   "--service-node-port-range=${toString settings.nodePortRange.from}-${toString settings.nodePortRange.to}"
+
+                  "--node-external-ip=${currentMachineIp}" # For etcd to choose correct ip?
+                  "--node-ip=${currentMachineIp}" # For etcd to choose correct ip?
+                  "--advertise-address=${settings.k3sApiAddress}"
+                  "--cluster-cidr 2001:db8:42::/56"
+                  "--service-cidr 2001:db8:43::/112"
+                  "--flannel-ipv6-masq"
+                  #
+                  #"--etcd-arg=--listen-peer-urls=https://[${currentMachineIp}]:2380"
+                  #"--etcd-arg=--listen-client-urls=https://[${currentMachineIp}]:2379"
+
                 ]
                 ++ settings.extraFlags
-                ++ (lib.lists.optional (settings.clusterInit) "--cluster-init");
+                ++ (lib.lists.optionals (settings.clusterInit) [
+                  "--cluster-init"
+                  # "--etcd-arg=--listen-peer-urls=https://[${currentMachineIp}]:2380"
+                  # "--etcd-arg=--listen-client-urls=https://[${currentMachineIp}]:2379"
+                  #"--cluster-cidr="
+                  #"--service-cidr="
+                ]);
               };
 
               networking.firewall.allowedTCPPorts = [
