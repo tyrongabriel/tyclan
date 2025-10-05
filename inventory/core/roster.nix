@@ -45,6 +45,32 @@ let
       #   ];
       # };
     };
+
+    ltc01 = {
+      users = {
+        tyron = {
+          homeManager = {
+            enable = true;
+            profiles = [
+              "base"
+            ];
+          };
+        };
+      };
+    };
+
+    hp01 = {
+      users = {
+        tyron = {
+          homeManager = {
+            enable = true;
+            profiles = [
+              "base"
+            ];
+          };
+        };
+      };
+    };
   };
 in
 {
