@@ -4,6 +4,7 @@ _: {
     module.input = "self";
 
     roles.peer = {
+      settings.sshUser = "tyron";
       settings.enableSSH = false; # No root login!
       tags.all = { };
     };

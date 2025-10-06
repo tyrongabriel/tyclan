@@ -17,6 +17,16 @@ _: {
         freeformType = lib.types.attrsOf lib.types.anything;
 
         options = {
+          sshUser = lib.mkOption {
+            type = lib.types.str;
+            default = "root";
+            description = "User to use for ssh";
+          };
+          exitNode = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = "Enable exit node";
+          };
           enableHostAliases = lib.mkOption {
             type = lib.types.bool;
             default = true;
@@ -39,13 +49,13 @@ _: {
       in
       {
         exports.networking = {
-          priority = lib.mkDefault 950;
+          priority = lib.mkDefault 1050;
           # TODO add user space network support to clan-cli
           peers = lib.mapAttrs (name: _machine: {
             host.var = {
               machine = name;
               generator = "${generatorName}-ip";
-              file = "tailscale-ipv4";
+              file = "tailscale-host";
             };
           }) roles.peer.machines;
         };
@@ -65,6 +75,7 @@ _: {
               "enableHostAliases"
               "enableSSH"
               "exitNode"
+              "sshUser"
             ];
 
             extraUpFlags =
@@ -105,6 +116,9 @@ _: {
               files.tailscale-ipv6 = {
                 secret = false;
               };
+              files.tailscale-host = {
+                secret = false;
+              };
               runtimeInputs = [ pkgs.coreutils ];
 
               prompts.tailscale-ipv4 = {
@@ -122,7 +136,8 @@ _: {
               ## Not needed with persist
               script = ''
                 cat $prompts/tailscale-ipv4 > "$out"/tailscale-ipv4 &&
-                cat $prompts/tailscale-ipv6 > "$out"/tailscale-ipv6
+                cat $prompts/tailscale-ipv6 > "$out"/tailscale-ipv6 &&
+                echo "${settings.sshUser}@$(cat "$prompts/tailscale-ipv4")" > "$out"/tailscale-host
               '';
 
               #runtimeInputs = [ pkgs.tailscale ];
