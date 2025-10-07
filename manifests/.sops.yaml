@@ -1,0 +1,9 @@
+# .sops.yaml
+keys:
+  - &users
+    - &tyron_yoga age1ejzmv648srczvsw42sv0wq9725ck6d4g3q28gskwgg5kfslqnywq92gm7f
+creation_rules:
+  - path_regex: .*.secret.yaml
+    key_groups:
+      - age:
+          - *tyron_yoga

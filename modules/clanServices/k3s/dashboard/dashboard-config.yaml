@@ -31,7 +31,7 @@ metadata:
     # Use Traefik's 'web' entrypoint (port 80)
     traefik.ingress.kubernetes.io/router.entrypoints: web
     # Force Traefik to not try and use HTTPS to the backend service
-    traefik.ingress.kubernetes.io/router.scheme: http
+    traefik.ingress.kubernetes.io/service.scheme: http # <-- CHANGED ANNOTATION
 spec:
   rules:
     - host: dashboard.k3s-cluster.home # <-- YOUR DESIRED HOSTNAME
@@ -41,6 +41,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: kubernetes-dashboard # Name of the Service created by the Helm chart
+                name: kubernetes-dashboard-kong-proxy # Name of the Service created by the Helm chart
                 port:
-                  number: 80 # The port the Dashboard service exposes (which maps to the Pod's port 9090)
+                  number: 443 # The port the Dashboard service exposes (which maps to the Pod's port 9090)

@@ -1,0 +1,21 @@
+app:
+  # Disable the built-in Ingress resource
+  ingress:
+    enabled: false
+
+# Configure the Kong sub-chart to use the correct proxy type and port
+kong:
+  enabled: true
+  proxy:
+    # Use ClusterIP as the service type is needed to be backend for Ingress
+    type: ClusterIP
+    # Ensure HTTP is enabled on the proxy service since the Ingress definition
+    # uses the 'kubernetes-dashboard-kong-proxy' service on port 8430,
+    # and the ingress specifies a defaultBackend which usually points to an internal
+    # service endpoint.
+    http:
+      enabled: true
+      # The Ingress specifies port 8430, so configure the Kong service to use it.
+      servicePort: 80
+    tls:
+      enabled: true

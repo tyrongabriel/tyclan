@@ -26,7 +26,10 @@ _: {
 
     ## Servers ##
     roles.server.machines = {
-      "ncvps01".settings.clusterInit = true;
+      "ncvps01".settings = {
+        k3sApiPort = 6454; # Since load balancer is also here, this is the port that the load balancer will connect to
+        clusterInit = true;
+      };
       "ltc01" = { };
     };
 

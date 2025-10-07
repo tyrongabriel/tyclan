@@ -184,6 +184,16 @@
         with lib;
         {
           options = {
+            k3sApiPort = mkOption {
+              type = types.port;
+              default = 6443;
+              description = "The port on which the k3s agent will listen for API requests";
+            };
+            k3sAdvertisedApiPort = mkOption {
+              type = types.port;
+              default = 6443;
+              description = "The port on which the k3s agent will advertise for API requests";
+            };
             clusterInit = mkOption {
               type = types.bool;
               default = false;
@@ -269,6 +279,7 @@
                   else
                     "";
                 extraFlags = [
+                  "--advertise-port=${toString settings.k3sAdvertisedApiPort}"
                   "--https-listen-port=${toString settings.k3sApiPort}"
                   "--tls-san=${loadBalancerIp}" # Alternate certificate SAN so that the load balancer has correct cert
                   "--service-node-port-range=${toString settings.nodePortRange.from}-${toString settings.nodePortRange.to}"
@@ -298,6 +309,7 @@
         with lib;
         {
           options = {
+
             extraFlags = mkOption {
               type = types.listOf types.str;
               default = [ ];
@@ -427,12 +439,14 @@
                   false;
             in
             {
+              swapDevices = lib.mkForce [ ]; # NEeded for k3s since it does not want any swap
               services.k3s = {
                 enable = true;
                 tokenFile = token_file;
                 serverAddr = lib.mkIf (!isInitialServer) "https://${loadBalancerIp}:${toString loadBalancerPort}";
 
                 extraFlags = [
+                  "--flannel-iface tailscale0"
                   "--bind-address=${currentMachineIp}"
                   "--node-external-ip=${currentMachineIp}" # For etcd to choose correct ip?
                   "--node-ip=${currentMachineIp}" # For etcd to choose correct ip?
@@ -453,11 +467,31 @@
               boot.kernelModules = [
                 "overlay"
                 "br_netfilter"
+                "nft_counter"
+                "nf_conntrack"
+                "nft-expr-counter"
               ];
               boot.kernel.sysctl = {
                 "net.bridge-nf-call-iptables" = 1;
                 "net.bridge-nf-call-ip6tables" = 1;
                 "net.ipv4.ip_forward" = 1;
+              };
+              boot.extraModprobeConfig = ''
+                install nft-expr-counter /bin/true
+                install nft-expr-immediate /bin/true
+                install nft-expr-meta /bin/true
+                install nft-expr-nat /bin/true
+                install nft-expr_lookup /bin/true
+              '';
+
+              systemd.services = {
+                nftables = {
+                  enable = true;
+                  after = [ "network.target" ];
+                  serviceConfig = {
+                    Environment = "IPTABLES_BACKEND=nft";
+                  };
+                };
               };
 
               networking.firewall = {
