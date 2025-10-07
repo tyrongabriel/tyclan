@@ -31,6 +31,7 @@ _: {
         clusterInit = true;
       };
       "ltc01" = { };
+      "hp01" = { };
     };
 
     ## Agents ##
