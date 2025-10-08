@@ -69,7 +69,7 @@
                 map (
                   server:
                   "server ${server.name} ${server.ip}:${
-                    toString roles.default.machines."${server.name}".settings.k3sApiPort
+                    toString roles.node.machines."${server.name}".settings.k3sApiPort
                   } check"
                 ) servers
               );
@@ -184,16 +184,6 @@
         with lib;
         {
           options = {
-            k3sApiPort = mkOption {
-              type = types.port;
-              default = 6443;
-              description = "The port on which the k3s agent will listen for API requests";
-            };
-            k3sAdvertisedApiPort = mkOption {
-              type = types.port;
-              default = 6443;
-              description = "The port on which the k3s agent will advertise for API requests";
-            };
             clusterInit = mkOption {
               type = types.bool;
               default = false;
@@ -227,9 +217,7 @@
         };
       perInstance =
         {
-          instanceName,
           settings,
-          lib,
           roles,
           machine,
           ...
@@ -279,8 +267,8 @@
                   else
                     "";
                 extraFlags = [
-                  "--advertise-port=${toString settings.k3sAdvertisedApiPort}"
-                  "--https-listen-port=${toString settings.k3sApiPort}"
+                  "--advertise-port=${toString roles.node.machines."${machine.name}".settings.k3sAdvertisedApiPort}" # Needs to only be defined in server, but in my service its defined in node!
+                  "--https-listen-port=${toString roles.node.machines."${machine.name}".settings.k3sApiPort}"
                   "--tls-san=${loadBalancerIp}" # Alternate certificate SAN so that the load balancer has correct cert
                   "--service-node-port-range=${toString settings.nodePortRange.from}-${toString settings.nodePortRange.to}"
                   "--advertise-address=${currentMachineIp}" # ${currentMachineIp}" # ${settings.k3sApiAddress}"
@@ -309,7 +297,6 @@
         with lib;
         {
           options = {
-
             extraFlags = mkOption {
               type = types.listOf types.str;
               default = [ ];
@@ -319,7 +306,6 @@
         };
       perInstance =
         {
-          instanceName,
           settings,
           roles,
           machine,
@@ -364,31 +350,29 @@
         };
     };
 
-    ### Intended for ALL machines that have something to do with this k3s cluster ###
-    default = {
+    ### Intended for ALL machines that will run k3s in this cluster ###
+    node = {
       interface =
         { lib, ... }:
         with lib;
         {
-          options =
-
-            {
-              tailscaleInstanceName = mkOption {
-                type = types.str;
-                default = "tailscale-net";
-                description = "The name of the tailscale instance (clan inventory) to use for this server";
-              };
-              k3sApiPort = mkOption {
-                type = types.port;
-                default = 6443;
-                description = "The port on which the k3s agent will listen for API requests";
-              };
-              extraFlags = mkOption {
-                type = types.listOf types.str;
-                default = [ ];
-                description = "Extra flags to pass to k3s agent";
-              };
+          options = {
+            k3sApiPort = mkOption {
+              type = types.port;
+              default = 6443;
+              description = "The port on which the k3s agent will listen for API requests";
             };
+            k3sAdvertisedApiPort = mkOption {
+              type = types.port;
+              default = 6443;
+              description = "The port on which the k3s agent will advertise for API requests";
+            };
+            extraFlags = mkOption {
+              type = types.listOf types.str;
+              default = [ ];
+              description = "Extra flags to pass to k3s agent";
+            };
+          };
         };
       perInstance =
         {
@@ -416,7 +400,9 @@
 
               ipPath = (
                 machineName:
-                "${config.clan.core.settings.directory}/vars/per-machine/${machineName}/tailscale-${settings.tailscaleInstanceName}-ip/tailscale-ipv4/value"
+                "${config.clan.core.settings.directory}/vars/per-machine/${machineName}/tailscale-${
+                  roles.default.machines."${machine.name}".settings.tailscaleInstanceName
+                }-ip/tailscale-ipv4/value"
               );
               getTailscaleIP = (
                 machineName:
@@ -511,11 +497,43 @@
               # For performance
               services.thermald.enable = lib.mkDefault true; # Manages the CPU temperature
               powerManagement.cpuFreqGovernor = lib.mkDefault "performance";
+            };
+        };
+    };
+    ### Intended for ALL machines that have something to do with this k3s cluster ###
+    default = {
+      interface =
+        { lib, ... }:
+        with lib;
+        {
+          options = {
+            tailscaleInstanceName = mkOption {
+              type = types.str;
+              default = "tailscale-net";
+              description = "The name of the tailscale instance (clan inventory) to use for this server";
+            };
+          };
+        };
+      perInstance =
+        {
+          instanceName,
+          settings,
+          machine,
+          roles,
+          ...
+        }:
+        {
+          nixosModule =
+            {
+              config,
+              pkgs,
+              lib,
+              ...
+            }:
+            {
 
             };
-
         };
     };
   };
-
 }

@@ -24,14 +24,14 @@ rules:
     verbs: ["get", "create", "update", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: kubernetes-dashboard-admin-role-binding
   namespace: kubernetes-dashboard
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: kubernetes-dashboard-admin-role
+  kind: ClusterRole
+  name: cluster-admin #kubernetes-dashboard-admin-role # Not enough permissions
 subjects:
   - kind: ServiceAccount
     name: kubernetes-dashboard-admin
@@ -44,5 +44,5 @@ metadata:
   name: kubernetes-dashboard-user-token
   namespace: kubernetes-dashboard
   annotations:
-    kubernetes.io/service-account.name: "kubernetes-dashboard"
+    kubernetes.io/service-account.name: "kubernetes-dashboard-admin"
 type: kubernetes.io/service-account-token

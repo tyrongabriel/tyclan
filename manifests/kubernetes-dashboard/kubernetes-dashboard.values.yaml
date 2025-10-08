@@ -22,7 +22,7 @@ auth:
   containers:
     resources:
       requests:
-        cpu: 800m
+        cpu: 1000m
         memory: 200Mi
       limits:
         cpu: 1000m
@@ -36,7 +36,7 @@ api:
   containers:
     resources:
       requests:
-        cpu: 800m
+        cpu: 1000m
         memory: 200Mi
       limits:
         cpu: 1000m
@@ -50,7 +50,7 @@ web:
   containers:
     resources:
       requests:
-        cpu: 800m
+        cpu: 1000m
         memory: 200Mi
       limits:
         cpu: 1000m

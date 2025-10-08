@@ -5,7 +5,6 @@ _: {
         "passwordless-sudo"
         "auto-gc"
         "k3s"
-        "k3s-proxy"
         "k3s-server"
         "k3s-agent"
         "vps"
@@ -14,9 +13,10 @@ _: {
     };
     ncvps02 = {
       tags = [
+        "k3s"
         "passwordless-sudo"
         "auto-gc"
-        #"k3s-proxy"
+        "k3s-proxy"
         "vps"
       ];
       #deploy.targetHost = "tyron@152.53.149.109";
