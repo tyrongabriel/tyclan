@@ -18,27 +18,25 @@ _: {
     };
 
     ## Load Balancer ##
-    roles.serverLoadBalancer.machines."ncvps01" = {
+    roles.serverLoadBalancer = {
       settings = {
         haproxyApiPort = 6443; # Clients will connect to this port
       };
+      tags."k3s-proxy" = { };
     };
 
     ## Servers ##
-    roles.server.machines = {
-      "ncvps01".settings = {
-        k3sApiPort = 6454; # Since load balancer is also here, this is the port that the load balancer will connect to
-        clusterInit = true;
+    roles.server = {
+      tags."k3s-server" = { };
+      machines = {
+        "ncvps01".settings = {
+          k3sApiPort = 6454; # Since load balancer is also here, this is the port that the load balancer will connect to
+          clusterInit = true;
+        };
       };
-      "ltc01" = { };
-      "hp01" = { };
     };
 
     ## Agents ##
-    roles.agent.machines = {
-      "ncvps01" = { };
-      "ltc01" = { };
-      "hp01" = { };
-    };
+    roles.agent.tags."k3s-agent" = { };
   };
 }

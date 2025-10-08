@@ -507,6 +507,11 @@
 
               # Deduplicate settings
               environment.systemPackages = [ pkgs.kubernetes-helm ];
+
+              # For performance
+              services.thermald.enable = lib.mkDefault true; # Manages the CPU temperature
+              powerManagement.cpuFreqGovernor = lib.mkDefault "performance";
+
             };
 
         };

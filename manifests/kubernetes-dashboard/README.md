@@ -16,3 +16,7 @@ kubectl apply -f k8s-dashboard-ingress.yaml -f k8s-dashboard-rbac.yaml
 ```bash
 kubectl -n kubernetes-dashboard create token kubernetes-dashboard
 ```
+Long lived:
+```bash
+kubectl get secret  kubernetes-dashboard-user-token -n kubernetes-dashboard -o jsonpath="{.data.token}" | base64 -d
+```

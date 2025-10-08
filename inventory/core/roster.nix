@@ -46,6 +46,29 @@ let
       # };
     };
 
+    ncvps02 = {
+      users = {
+        tyron = {
+          homeManager = {
+            enable = true;
+            profiles = [
+              "base"
+            ];
+          };
+        };
+      };
+      # homeManagerOptions = {
+      #   sharedModules = [
+      #     {
+      #       wayland.windowManager.hyprland.settings.monitor = [
+      #         "eDP-1,2880x1920@120,auto,2"
+      #         "DP-3,preferred,auto,1,mirror,eDP-1"
+      #       ];
+      #     }
+      #   ];
+      # };
+    };
+
     ltc01 = {
       users = {
         tyron = {

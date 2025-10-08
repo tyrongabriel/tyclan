@@ -30,6 +30,7 @@ with lib;
 
   environment.systemPackages = with pkgs; [
     btop
+    ghostty.terminfo # Installs terminfo for ghostty so we can ssh into it with ghostty
   ];
 
   networking = {
