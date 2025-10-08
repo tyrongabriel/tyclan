@@ -11,19 +11,6 @@ with lib;
     openFirewall = true;
   };
 
-  ### TEMPORARY !!! TO INCREASE DEV SPEED ###
-  security.sudo.extraRules = [
-    {
-      users = [ "tyron" ];
-      commands = [
-        {
-          command = "ALL";
-          options = [ "NOPASSWD" ];
-        }
-      ];
-    }
-  ];
-
   #services.avahi.enable = true;
   nixpkgs.config.allowUnfree = true;
   clan.core.settings.state-version.enable = true;

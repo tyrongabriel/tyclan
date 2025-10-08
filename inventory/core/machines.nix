@@ -2,6 +2,8 @@ _: {
   machines = {
     ncvps01 = {
       tags = [
+        "passwordless-sudo"
+        "auto-gc"
         "k3s"
         "k3s-proxy"
         "k3s-server"
@@ -12,6 +14,8 @@ _: {
     };
     ncvps02 = {
       tags = [
+        "passwordless-sudo"
+        "auto-gc"
         #"k3s-proxy"
         "vps"
       ];
@@ -19,6 +23,8 @@ _: {
     };
     ltc01 = {
       tags = [
+        "passwordless-sudo"
+        "auto-gc"
         "k3s"
         "k3s-server"
         "k3s-agent"
@@ -27,6 +33,8 @@ _: {
     };
     hp01 = {
       tags = [
+        "passwordless-sudo"
+        "auto-gc"
         "k3s"
         "k3s-server"
         "k3s-agent"
