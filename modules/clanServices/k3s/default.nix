@@ -313,7 +313,12 @@
         }:
         {
           nixosModule =
-            { lib, config, ... }:
+            {
+              lib,
+              config,
+              pkgs,
+              ...
+            }:
             let
               ipPath = (
                 machineName:
@@ -346,6 +351,24 @@
                 serverAddr = lib.mkIf (!isInitialServer) "https://${loadBalancerIp}:${toString loadBalancerPort}";
                 extraFlags = settings.extraFlags;
               };
+
+              # For Longhorn to work!
+              environment.systemPackages = with pkgs; [
+                # Other packages...
+                openiscsi
+              ];
+              # Fix for longhorn https://github.com/longhorn/longhorn/issues/2166#issuecomment-2994323945
+              services.openiscsi = {
+                enable = true;
+                name = "${config.networking.hostName}-initiatorhost";
+              };
+              systemd.services.iscsid.serviceConfig = {
+                PrivateMounts = "yes";
+                BindPaths = "/run/current-system/sw/bin:/bin";
+              };
+
+              # Enable the iSCSI daemon
+              #services.openiscsi.enable = lib.mkForce true;
             };
         };
     };
