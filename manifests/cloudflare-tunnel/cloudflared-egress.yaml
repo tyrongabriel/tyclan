@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cloudflared-tunnel-egress
+  namespace: cloudflared # Ensure this is the correct namespace
+spec:
+  # 1. Select the cloudflared pod using its labels
+  podSelector:
+    matchLabels:
+      # !! REPLACE THIS WITH THE ACTUAL LABEL from the kubectl command above !!
+      pod: cloudflared # Example
+  policyTypes:
+    - Egress
+  # 2. Define the allowed outbound rules
+  egress:
+    # Rule 1: Allow DNS lookups (TCP and UDP) to Cluster DNS/anywhere
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0 # Allows all outbound traffic (you can restrict to specific DNS IPs if known)
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Rule 2: Allow Cloudflare Tunnel connection (QUIC/UDP and Fallback/TCP)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0 # Allows connectivity to Cloudflare's edge IPs
+      ports:
+        - protocol: UDP
+          port: 7844 # QUIC
+        - protocol: TCP
+          port: 7844 # QUIC
+        - protocol: UDP
+          port: 443 # QUIC fallback
+        - protocol: TCP
+          port: 443 # TCP/TLS fallback
+        - protocol: UDP
+          port: 80 # QUIC fallback
+        - protocol: TCP
+          port: 80 # TCP/TLS fallback

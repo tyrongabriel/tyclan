@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whoami-cf-ingress
+  namespace: whoami
+#  annotations:
+#    cert-manager.io/cluster-issuer: "cloudflare-issuer"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - whoami.tyrongabriel.com
+  #      secretName: cf-whoami-tls
+  rules:
+    - host: whoami.tyrongabriel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami
+                port:
+                  number: 80

@@ -60,6 +60,7 @@
           nh
           just
           customScripts
+          cloudflared
         ];
       };
     };

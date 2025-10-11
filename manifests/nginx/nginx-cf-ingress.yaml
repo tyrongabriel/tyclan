@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-cf-ingress
+  namespace: nginx-hello-world
+#  annotations:
+#    cert-manager.io/cluster-issuer: "cloudflare-issuer"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - nginx.tyrongabriel.com
+  #      secretName: cf-whoami-tls
+  rules:
+    - host: nginx.tyrongabriel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80

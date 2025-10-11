@@ -1,0 +1,76 @@
+# --- # Only works with locally managed tunnel
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: cloudflared
+#   namespace: cloudflared
+# data:
+#   config.yml: |
+#     tunnel: k3s-cluster-tunnel
+#     ingress:
+#       - hostname: tyrongabriel.com
+#         service: https://traefik.kube-system.svc.cluster.local:443
+#       - hostname: "*.tyrongabrielcom"
+#         service: https://traefik.kube-system.svc.cluster.local:443
+#       - service: http_status:404
+#---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared-deployment
+  namespace: cloudflared
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      pod: cloudflared
+  template:
+    metadata:
+      labels:
+        pod: cloudflared
+    spec:
+      securityContext:
+        sysctls:
+          # Allows ICMP traffic (ping, traceroute) to resources behind cloudflared.
+          - name: net.ipv4.ping_group_range
+            value: "65532 65532"
+      containers:
+        - image: cloudflare/cloudflared:latest
+          name: cloudflared
+          env:
+            # Defines an environment variable for the tunnel token.
+            - name: TUNNEL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflared-tunnel-token
+                  key: token
+          command:
+            # Configures tunnel run parameters
+            - cloudflared
+            - tunnel
+            - --protocol
+            - http2 # Could not for the life of me get this to work with quic
+            - --no-autoupdate
+            - --loglevel
+            - debug
+            - --metrics
+            - 0.0.0.0:2000
+            - run
+          startupProbe:
+            exec:
+              command:
+                - cloudflared
+                - version
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          livenessProbe: #sudo tcpdump -n -i eth0 port 7844 and udp
+            httpGet:
+              # Cloudflared has a /ready endpoint which returns 200 if and only if
+              # it has an active connection to Cloudflare's network.
+              path: /ready
+              port: 2000
+            failureThreshold: 1
+            initialDelaySeconds: 10
+            periodSeconds: 10

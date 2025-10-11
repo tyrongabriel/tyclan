@@ -461,6 +461,9 @@
                 "net.bridge-nf-call-iptables" = 1;
                 "net.bridge-nf-call-ip6tables" = 1;
                 "net.ipv4.ip_forward" = 1;
+                # For cloudflare tunnel instance!
+                "net.core.rmem_max" = 10000000;
+                "net.core.wmem_max" = 10000000;
               };
               boot.extraModprobeConfig = ''
                 install nft-expr-counter /bin/true
@@ -484,10 +487,15 @@
                 allowedTCPPorts = [
                   settings.k3sApiPort # K3s API
                   10250 # Kubelet stuff
+                  7844 # Cloudflare quic
+
                 ];
                 allowedUDPPorts = [
                   8472 # Flannel VXLAN (only if using Flannel, default in K3s)
                   10250 # Kubelet stuff
+                  7844 # Cloudflare quic
+                  #443 # Cloudflare
+                  #80 # Cloudflare
                 ];
               };
 
