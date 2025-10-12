@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n8n-configmap
+  namespace: n8n
+  labels:
+    app: n8n
+    component: configmap
+data:
+  TZ: "Europe/Vienna"
+  N8N_RUNNERS_ENABLED: "true"
+  NODE_ENV: "production"
+  GENERIC_TIMEZONE: "Europe/Warsaw"
+  #WEBHOOK_TUNNEL_URL: "http://n8n.local/"
+  # Database configurations
+  DB_TYPE: "postgresdb"
+  # Turn on basic auth
+  N8N_BASIC_AUTH_ACTIVE: "true"
+  N8N_BASIC_AUTH_USER: "n8n"

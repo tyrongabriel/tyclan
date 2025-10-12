@@ -1,0 +1,27 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: n8n-db
+  namespace: n8n # Assuming you'll deploy Authentik here
+spec:
+  instances: 2 # For high availability (one primary, two replicas)
+  storage:
+    size: 2Gi # Adjust size based on your needs
+    storageClass: longhorn # Set up longhorn before!!
+
+  # Bootstrap configuration for initial database setup
+  bootstrap:
+    initdb:
+      database: n8n
+      owner: n8n
+
+  # Optional: PostgreSQL configuration parameters
+  postgresql:
+    parameters:
+      max_connections: "100"
+
+  # # Define a dedicated service for read-only traffic
+  # replica:
+  #   serviceTemplate:
+  #     metadata:
+  #       name: authentik-db-replicas-service
