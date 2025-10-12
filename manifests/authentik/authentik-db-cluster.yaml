@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: authentik
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: authentik-db
+  namespace: authentik # Assuming you'll deploy Authentik here
+spec:
+  instances: 3 # For high availability (one primary, two replicas)
+  storage:
+    size: 2Gi # Adjust size based on your needs
+    storageClass: longhorn # Set up longhorn before!!
+
+  # Bootstrap configuration for initial database setup
+  bootstrap:
+    initdb:
+      database: authentik
+      owner: authentik
+
+  # Optional: PostgreSQL configuration parameters
+  postgresql:
+    parameters:
+      max_connections: "100"
+
+  # # Define a dedicated service for read-only traffic
+  # replica:
+  #   serviceTemplate:
+  #     metadata:
+  #       name: authentik-db-replicas-service

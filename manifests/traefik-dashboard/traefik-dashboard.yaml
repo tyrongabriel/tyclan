@@ -16,19 +16,3 @@ spec:
   selector:
     app.kubernetes.io/instance: traefik-kube-system
     app.kubernetes.io/name: traefik
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: traefik-dashboard-ingress
-  namespace: kube-system
-spec:
-  ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: traefik-dashboard
-      port:
-        number: 9000
-  tls:
-    - hosts:
-        - traefik
