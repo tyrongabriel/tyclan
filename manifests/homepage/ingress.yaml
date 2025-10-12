@@ -1,0 +1,31 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: homepage-ingress
+  namespace: homepage
+  labels:
+    app.kubernetes.io/name: homepage
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`home.tyrongabriel.com`)
+      kind: Rule
+      services:
+        - name: homepage
+          port: 3000
+          namespace: homepage
+          sticky:
+            cookie:
+              httpOnly: true
+              secure: true
+              sameSite: none
+      middlewares:
+        - name: k3s-authentik-outpost
+          namespace: authentik # Replace with the actual namespace of your Authentik middleware
+  tls:
+    #certResolver: cloudflare-issuer # Use the cert resolver from your annotations
+    domains:
+      - main: home.tyrongabriel.com
+        sans:
+          - home.tyrongabriel.com
