@@ -274,6 +274,14 @@
                   "--advertise-address=${currentMachineIp}" # ${currentMachineIp}" # ${settings.k3sApiAddress}"
                   "--cluster-cidr=10.42.0.0/16"
                   "--service-cidr=10.43.0.0/16"
+
+                  # For kube-prometheus: https://fabianlee.org/2022/07/02/prometheus-installing-kube-prometheus-stack-on-k3s-cluster/
+                  ## Kube-Scheduler
+                  "--kube-scheduler-arg=bind-address=0.0.0.0"
+                  ## Etcd
+                  "--etcd-expose-metrics" # Server only
+                  ## Kube Controller manager
+                  "--kube-controller-manager-arg=bind-address=0.0.0.0" # Server only
                 ]
                 ++ settings.extraFlags
                 ++ (lib.lists.optionals (settings.clusterInit) [
@@ -459,6 +467,8 @@
                   "--bind-address=${currentMachineIp}"
                   "--node-external-ip=${currentMachineIp}" # For etcd to choose correct ip?
                   "--node-ip=${currentMachineIp}" # For etcd to choose correct ip?
+                  # For kube-prometheus: https://fabianlee.org/2022/07/02/prometheus-installing-kube-prometheus-stack-on-k3s-cluster/
+                  "--kube-proxy-arg=metrics-bind-address=0.0.0.0"
                 ]
                 ++ settings.extraFlags;
               };
