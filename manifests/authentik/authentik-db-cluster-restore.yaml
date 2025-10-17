@@ -1,12 +1,7 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: authentik
----
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: authentik-db
+  name: authentik-db-recover
   namespace: authentik # Assuming you'll deploy Authentik here
 spec:
   instances: 3 # For high availability (one primary, two replicas)
@@ -16,9 +11,12 @@ spec:
 
   # Bootstrap configuration for initial database setup
   bootstrap:
-    initdb:
-      database: authentik
-      owner: authentik
+    recovery:
+      volumeSnapshots:
+        storage:
+          name: authentik-db-20251016152445
+          kind: VolumeSnapshot
+          apiGroup: snapshot.storage.k8s.io
 
   # Optional: PostgreSQL configuration parameters
   postgresql:

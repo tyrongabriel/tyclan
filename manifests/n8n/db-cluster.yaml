@@ -4,10 +4,10 @@ metadata:
   name: n8n-db
   namespace: n8n # Assuming you'll deploy Authentik here
 spec:
-  instances: 2 # For high availability (one primary, two replicas)
+  instances: 3 # For high availability (one primary, one replicas)
   storage:
     size: 2Gi # Adjust size based on your needs
-    storageClass: longhorn # Set up longhorn before!!
+    storageClass: longhorn-rc-1 # Set up longhorn before!!
 
   # Bootstrap configuration for initial database setup
   bootstrap:
