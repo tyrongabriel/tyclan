@@ -1,5 +1,15 @@
 _: {
   machines = {
+    yoga = {
+      tags = [
+        #"passwordless-sudo"
+        "auto-gc"
+        "laptop"
+        "gnome"
+        "explicit-update"
+      ];
+      #deploy.targetHost = "tyron@152.53.149.109";
+    };
     ncvps01 = {
       tags = [
         "passwordless-sudo"

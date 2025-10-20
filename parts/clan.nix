@@ -1,20 +1,33 @@
 {
   inputs,
   self,
+  lib,
   ...
 }:
 let
+  # Import custom lib
+  myLib = import ../lib/default.nix {
+    inherit inputs;
+    inherit lib;
+  };
+
   # Import modules directly
   modules = import "${self}/modules/clanServices/default.nix" { inherit inputs; };
 in
 {
   clan = {
-    specialArgs = { inherit inputs; };
+    specialArgs = {
+      inherit inputs;
+      inherit myLib;
+    };
     inherit self;
     meta.name = "Tyclan";
     meta.description = "Tyclan Flake";
     inherit modules;
-    inventory = import "${self}/inventory" { inherit inputs; };
+    inventory = import "${self}/inventory" {
+      inherit inputs;
+      inherit myLib;
+    };
 
     # Additional NixOS configuration can be added here.
     # machines/jon/configuration.nix will be automatically imported.

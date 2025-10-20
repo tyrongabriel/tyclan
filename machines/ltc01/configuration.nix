@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }:
+{
+  pkgs,
+  lib,
+  myLib,
+  ...
+}:
 {
   environment.systemPackages = with pkgs; [
     btop

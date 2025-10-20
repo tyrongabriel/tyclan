@@ -8,9 +8,11 @@ _: {
       "Networking"
       "VPN"
     ];
+    readme = builtins.readFile ./README.md;
   };
 
   roles.peer = {
+    description = "A peer node for tailscale.";
     interface =
       { lib, ... }:
       {

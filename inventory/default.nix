@@ -3,7 +3,9 @@ let
   inherit (inputs.nixpkgs) lib;
 
   # Import modules
-  core = import ./core { inherit inputs; }; # Clan Config
+  core = import ./core {
+    inherit inputs;
+  }; # Clan Config
   services = import ./services { inherit inputs; }; # Clan service instances
   tags = import ./tags { inherit inputs; };
 

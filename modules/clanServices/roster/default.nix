@@ -5,8 +5,10 @@
   manifest.name = "roster";
   manifest.description = "Holistic user management with position-based access control and home environment configuration";
   manifest.categories = [ "System" ];
+  manifest.readme = builtins.readFile ./README.md;
 
   roles.default = {
+    description = "Default role for roster service.";
     interface =
       { lib, ... }:
       {

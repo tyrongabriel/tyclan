@@ -13,7 +13,7 @@ with lib;
 
   #services.avahi.enable = true;
   nixpkgs.config.allowUnfree = true;
-  clan.core.settings.state-version.enable = true;
+  clan.core.settings.state-version.enable = lib.mkDefault true;
 
   environment.systemPackages = with pkgs; [
     btop
@@ -52,4 +52,5 @@ with lib;
     variant = "nodeadkeys";
     options = "caps:escape";
   };
+
 }

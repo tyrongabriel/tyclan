@@ -2,10 +2,13 @@
 {
   _class = "clan.service";
   manifest.name = "k3s";
+  manifest.description = "K3s cluster management";
+  manifest.readme = builtins.readFile ./README.md;
 
   roles = {
     ### HAProxy for server load balancer ###
     serverLoadBalancer = {
+      description = "The load balancer to which the other nodes will point to to access the control plane.";
       interface =
         { lib, ... }:
         with lib;
@@ -179,6 +182,7 @@
 
     ### K3s server ###
     server = {
+      description = "A k3s control plane server node.";
       interface =
         { lib, ... }:
         with lib;
@@ -300,6 +304,7 @@
 
     ### K3s agent ###
     agent = {
+      description = "A regular k3s agent node.";
       interface =
         { lib, ... }:
         with lib;
@@ -383,6 +388,7 @@
 
     ### Intended for ALL machines that will run k3s in this cluster ###
     node = {
+      description = "A node (Either server, agent or both) that will have basic node config.";
       interface =
         { lib, ... }:
         with lib;
@@ -543,6 +549,7 @@
     };
     ### Intended for ALL machines that have something to do with this k3s cluster ###
     default = {
+      description = "Default k3s machine config.";
       interface =
         { lib, ... }:
         with lib;
