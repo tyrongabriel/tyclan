@@ -18,6 +18,7 @@ _: {
         "k3s-server"
         "k3s-agent"
         "vps"
+        #"netbird"
       ];
       #deploy.targetHost = "tyron@152.53.149.109";
     };
