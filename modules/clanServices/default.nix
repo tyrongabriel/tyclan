@@ -8,6 +8,8 @@ let
     "@tyclan/tailscale" = ./tailscale;
     "@tyclan/tailscale-traefik" = ./tailscale-traefik;
     "@tyclan/netbird" = ./netbird;
+    "@tyclan/desktop" = ./desktop;
+    "@tyclan/stylix" = ./stylix;
     #"module-name" = import ./module-name;
 
   };

@@ -30,6 +30,7 @@ let
             enable = true;
             profiles = [
               "base"
+              "stylix" # Needs to be enabled for all machines using stylix, since it depends on home-manager options
             ];
           };
         };

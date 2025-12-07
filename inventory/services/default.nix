@@ -11,6 +11,9 @@ let
     k3s = import ./k3s.nix { inherit inputs; };
     tailscale = import ./tailscale.nix { inherit inputs; };
     netbird = import ./netbird.nix { inherit inputs; };
+    nixos-modules = import ./nixos-modules.nix { inherit inputs; };
+    desktop = import ./desktop.nix { inherit inputs; };
+    stylix = import ./stylix.nix { inherit inputs; };
   };
 in
 lib.foldr lib.recursiveUpdate { } (lib.attrValues services)

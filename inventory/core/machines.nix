@@ -6,6 +6,7 @@ _: {
         "auto-gc"
         "laptop"
         "gnome"
+        "catppuccin-mocha"
         "explicit-update"
       ];
       #deploy.targetHost = "tyron@152.53.149.109";

@@ -2,7 +2,8 @@
   inputs = {
     ## Clan Core ##
     clan-core.url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
-    nixpkgs.follows = "clan-core/nixpkgs"; # Points to a stable, audited version of nixpkgs!
+    #nixpkgs.follows = "clan-core/nixpkgs"; # Points to a stable, audited version of nixpkgs!
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
 
     ## Flake-Parts (With clan) ##
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -10,17 +11,22 @@
 
     ## Custom Nixpkgs Versions ##
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-25_05.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-25_11.url = "github:NixOS/nixpkgs/nixos-25.11";
 
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-25.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    stylix = {
+      url = "github:danth/stylix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
   outputs =
     inputs@{
       flake-parts,
-      nixpkgs-25_05,
+      nixpkgs-25_11,
       nixpkgs-unstable,
       ...
     }:
