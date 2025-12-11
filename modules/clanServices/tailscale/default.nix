@@ -1,4 +1,11 @@
-_: {
+{
+  lib,
+  clanLib,
+  config,
+  directory,
+  ...
+}:
+{
   _class = "clan.service";
 
   manifest = {
@@ -10,6 +17,19 @@ _: {
     ];
     readme = builtins.readFile ./README.md;
   };
+
+  # Ever since networking update
+  # https://git.clan.lol/clan/clan-core/src/commit/a77c299bf38edda2c93db84d96174433d16af502/clanServices/zerotier/default.nix
+  # See the exports parsing: https://git.clan.lol/clan/clan-core/src/commit/a77c299bf38edda2c93db84d96174433d16af502/pkgs/clan-cli/clan_lib/network/network.py
+  exports = lib.mapAttrs' (instanceName: _: {
+    name = clanLib.buildScopeKey {
+      inherit instanceName;
+      serviceName = config.manifest.name;
+    };
+    value = {
+      networking.priority = lib.mkDefault 2050;
+    };
+  }) config.instances;
 
   roles.peer = {
     description = "A peer node for tailscale.";
@@ -44,23 +64,38 @@ _: {
         roles,
         lib,
         machine,
+        mkExports,
         ...
       }:
       let
         generatorName = "tailscale-${instanceName}";
       in
       {
-        exports.networking = {
-          priority = lib.mkDefault 1050;
-          # TODO add user space network support to clan-cli
-          peers = lib.mapAttrs (name: _machine: {
-            host.var = {
-              machine = name;
-              generator = "${generatorName}-ip";
-              file = "tailscale-host";
-            };
-          }) roles.peer.machines;
+
+        exports = mkExports {
+          peer.hosts = [
+            {
+              plain = clanLib.getPublicValue {
+                machine = machine.name;
+                generator = "${generatorName}-ip";
+                file = "tailscale-host";
+                flake = directory;
+              };
+            }
+          ];
         };
+
+        # exports.networking = {
+        #   priority = lib.mkDefault 1050;
+        #   # TODO add user space network support to clan-cli
+        #   peers = lib.mapAttrs (name: _machine: {
+        #     host.var = {
+        #       machine = name;
+        #       generator = "${generatorName}-ip";
+        #       file = "tailscale-host";
+        #     };
+        #   }) roles.peer.machines;
+        # };
         nixosModule =
           {
             config,

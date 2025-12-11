@@ -30,17 +30,17 @@
         {
           # When adding machine: clan vars generate <machine> --regenerate --generator netbird-netbird-ip
           # To set the generated ip
-          exports.networking = {
-            priority = lib.mkDefault 1100;
-            # TODO add user space network support to clan-cli
-            peers = lib.mapAttrs (name: _machine: {
-              host.var = {
-                machine = name;
-                generator = "netbird-${instanceName}-ip";
-                file = "host";
-              };
-            }) roles.peer.machines;
-          };
+          # exports.networking = {
+          #   priority = lib.mkDefault 1100;
+          #   # TODO add user space network support to clan-cli
+          #   peers = lib.mapAttrs (name: _machine: {
+          #     host.var = {
+          #       machine = name;
+          #       generator = "netbird-${instanceName}-ip";
+          #       file = "host";
+          #     };
+          #   }) roles.peer.machines;
+          # };
           nixosModule =
             { config, pkgs, ... }:
             {
