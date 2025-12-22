@@ -5,6 +5,7 @@
       settings,
       roles,
       machine,
+      mkExports,
       ...
     }:
     {
@@ -137,6 +138,11 @@
             targets.plymouth.enable = true;
             #targets.opencode.enable = false;
             #targets.gnome-text-editor.enable = false;
+
+            ## THIS IS HARDCODED FRO GNOME... MIGHT MOVE TO DESKTOP SERVICE
+            # Woul dneed to detect if stylix is used
+            #targets.qt.platformTheme.name = lib.mkDefault "adwaita";
+            #targets.qt.platform = lib.mkForce "qtct";
 
             autoEnable = true;
 

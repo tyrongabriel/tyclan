@@ -15,7 +15,11 @@
         with lib;
         {
           options = {
-
+            usesStylix = mkOption {
+              type = types.bool;
+              default = false;
+              description = "Whether the machine uses stylix or not, needed to set flag to disable gnome target";
+            };
           };
         };
     };

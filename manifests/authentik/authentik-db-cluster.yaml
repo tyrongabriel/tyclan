@@ -11,7 +11,7 @@ metadata:
 spec:
   instances: 3 # For high availability (one primary, two replicas)
   storage:
-    size: 4Gi # Adjust size based on your needs
+    size: 12Gi # Adjust size based on your needs
     storageClass: longhorn-rc-1 # Set up longhorn before!!
 
   # Bootstrap configuration for initial database setup

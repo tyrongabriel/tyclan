@@ -1,3 +1,4 @@
+{ clanLib, ... }:
 {
   roles.gnome.perInstance =
     {
@@ -5,6 +6,7 @@
       settings,
       roles,
       machine,
+      exports,
       ...
     }:
     {
@@ -66,6 +68,11 @@
             NIXOS_OZONE_WL = "1"; # Forces apps using XWayland to prefer Wayland
             # Enables Wayland for Electron apps
             ELECTRON_OZONE_PLATFORM_HINT = "auto"; # Ensures Electron apps use native Wayland
+          };
+
+          # Eval warning otherwise!
+          stylix.targets = lib.mkIf settings.usesStylix {
+            qt.enable = false;
           };
         };
 

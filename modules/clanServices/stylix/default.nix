@@ -1,11 +1,17 @@
-{ ... }:
+{
+  lib,
+  config,
+  clanLib,
+  ...
+}:
 {
   _class = "clan.service";
-  manifest.name = "Stylix";
+  manifest.name = "stylix";
   manifest.description = "Clan Stylix Service";
   manifest.readme = builtins.readFile ./README.md;
 
   imports = [ ./catppuccin.nix ];
+
   roles = {
     catppuccin = {
       description = "Ricing with stylix catppuccin.";

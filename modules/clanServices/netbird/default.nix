@@ -76,7 +76,10 @@
               systemd.services."netbird-register-${instanceName}" = {
                 description = "NetBird One-Shot Registration and Login for <instanceName>";
                 wantedBy = [ "multi-user.target" ];
-                wants = [ "${instanceName}.service" ];
+                wants = [
+                  "${instanceName}.service"
+                  "network-online.target"
+                ];
                 after = [ "network-online.target" ];
 
                 # NixOS often needs these explicitly set to '0' for oneshot services

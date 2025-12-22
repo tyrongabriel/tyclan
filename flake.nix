@@ -47,6 +47,27 @@
         ./parts/devshells.nix
       ];
 
+      perSystem =
+        { system, ... }:
+        {
+          _module.args.pkgs = import inputs.nixpkgs {
+            inherit system;
+            overlays = [
+              # Fails propagation to home-manager, find in nixos default module
+              # (final: prev: {
+              #   unstable = import inputs.nixpkgs-unstable {
+              #     inherit (prev) system;
+              #     config = prev.config;
+              #     # config = {
+              #     #   allowUnfree = true;
+              #     # };
+              #   };
+              # })
+            ];
+            config = { };
+          };
+        };
+
       # https://docs.clan.lol/guides/getting-started/flake-parts/
       # clan = {
       #   specialArgs = {

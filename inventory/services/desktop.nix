@@ -3,6 +3,7 @@ _: {
   instances.desktop = {
     module.name = "@tyclan/desktop";
     module.input = "self";
-    roles.gnome.tags.gnome = { };
+    roles.gnome.tags = [ "gnome" ];
+    roles.gnome.machines."yoga".settings.usesStylix = true;
   };
 }

@@ -5,4 +5,6 @@
 
   # stylix.autoEnable = false;
   # #stylix.targets.opencodesex.enable = false;
+  #
+  stylix.targets.firefox.profileNames = [ "default" ];
 }

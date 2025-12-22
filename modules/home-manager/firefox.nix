@@ -9,7 +9,7 @@
 
     # Firefox profile settings
     profiles = {
-      privacy-profile = {
+      default = {
         isDefault = true;
 
         # Essential extensions
