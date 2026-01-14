@@ -7,6 +7,7 @@ _: {
         ltc01.settings.host = "tyron@192.168.8.10";
         hp01.settings.host = "tyron@192.168.8.11";
         yoga.settings.host = "tyron@localhost";
+        typc.settings.host = "tyron@192.168.1.138";
       };
     };
   };

@@ -5,7 +5,10 @@
   manifest.description = "Clan Desktop Service to set desktop environment";
   manifest.readme = builtins.readFile ./README.md;
 
-  imports = [ ./gnome.nix ];
+  imports = [
+    ./gnome.nix
+    ./cosmic.nix
+  ];
 
   roles = {
     gnome = {
@@ -19,6 +22,21 @@
               type = types.bool;
               default = false;
               description = "Whether the machine uses stylix or not, needed to set flag to disable gnome target";
+            };
+          };
+        };
+    };
+    cosmic = {
+      description = "COSMIC (Wayland) Desktop environment.";
+      interface =
+        { lib, ... }:
+        with lib;
+        {
+          options = {
+            usesStylix = mkOption {
+              type = types.bool;
+              default = false;
+              description = "Whether the machine uses stylix or not, needed to set flag to disable cosmic target";
             };
           };
         };

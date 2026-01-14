@@ -10,6 +10,7 @@ let
     "@tyclan/netbird" = ./netbird;
     "@tyclan/desktop" = ./desktop;
     "@tyclan/stylix" = ./stylix;
+    "@tyclan/hytale-server" = ./hytale-server;
     #"module-name" = import ./module-name;
 
   };

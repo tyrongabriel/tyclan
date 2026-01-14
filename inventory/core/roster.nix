@@ -11,6 +11,7 @@ let
         "audio"
         "input"
         "kvm"
+        "docker"
       ];
       sshAuthorizedKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEqAq3GCuNXFc8mQL+H/czF0+pOlyQ4c4GILKUcrK0fZ 51530686+tyrongabriel@users.noreply.github.com"
@@ -24,6 +25,29 @@ let
 
     # ========== Tyron Machines ===========
     yoga = {
+      users = {
+        tyron = {
+          homeManager = {
+            enable = true;
+            profiles = [
+              "base"
+              "stylix" # Needs to be enabled for all machines using stylix, since it depends on home-manager options
+            ];
+          };
+        };
+      };
+      # homeManagerOptions = {
+      #   sharedModules = [
+      #     {
+      #       wayland.windowManager.hyprland.settings.monitor = [
+      #         "eDP-1,2880x1920@120,auto,2"
+      #         "DP-3,preferred,auto,1,mirror,eDP-1"
+      #       ];
+      #     }
+      #   ];
+      # };
+    };
+    typc = {
       users = {
         tyron = {
           homeManager = {

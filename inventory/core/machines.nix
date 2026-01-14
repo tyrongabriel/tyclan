@@ -12,6 +12,17 @@ _: {
       ];
       #deploy.targetHost = "tyron@152.53.149.109";
     };
+    typc = {
+      tags = [
+        "auto-gc"
+        "laptop"
+        #"gnome"
+        "cosmic"
+        "catppuccin-mocha"
+        "explicit-update"
+        "netbird"
+      ];
+    };
     ncvps01 = {
       tags = [
         "passwordless-sudo"

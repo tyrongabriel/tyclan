@@ -58,7 +58,7 @@
   #   address = "fe80::1"; # Your VPS's provided gateway
   #   interface = "ens3";
   # };
-
+  #
   networking.firewall.allowedTCPPorts = [ 80 ]; # For testing
 
   clan.core.settings.state-version.enable = true;

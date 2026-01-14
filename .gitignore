@@ -1,3 +1,4 @@
 result
 .direnv/
 .zed/
+.llm-context/
