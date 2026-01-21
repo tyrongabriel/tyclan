@@ -98,6 +98,11 @@
               default = true;
               description = "Open the firewall for hytale server proxy";
             };
+            external-interface = mkOption {
+              type = types.str;
+              default = "eth0";
+              description = "External interface for NAT";
+            };
           };
         };
     };

@@ -47,7 +47,7 @@
 
           networking.nat = {
             enable = true;
-            externalInterface = "ens3"; # verify with 'ip route' on your VPS
+            externalInterface = settings.external-interface; # verify with 'ip route' on your VPS
             internalInterfaces = [ "wg-${lib.substring 0 12 instanceName}" ];
             forwardPorts = [
               {
