@@ -3,13 +3,24 @@ kind: Ingress
 metadata:
   name: traefik-dashboard-ingress-ts
   namespace: kube-system
+  annotations:
+    # Force the Tailscale node name to be exactly 'traefik'
+    tailscale.com/hostname: traefik
+    # Explicitly set the backend protocol
+    tailscale.com/backend-protocol: "http"
 spec:
   ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: traefik-dashboard
-      port:
-        number: 9000
+  rules:
+    - host: traefik
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: traefik-dashboard
+                port:
+                  number: 9000
   tls:
     - hosts:
         - traefik

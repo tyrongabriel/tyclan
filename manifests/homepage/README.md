@@ -12,6 +12,11 @@ kubectl apply \
     -f config-map.yaml
 ```
 
+## Create secrets for API tokens
+```
+sops decrypt homepage-tokens.secret.yaml | kubectl apply -f -
+```
+
 # Uninstall using Manifests
 
 ```bash
