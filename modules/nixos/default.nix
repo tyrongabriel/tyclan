@@ -17,5 +17,11 @@ in
         config.allowUnfree = true;
       };
     })
+    (final: prev: {
+      stable-25_11 = import inputs.nixpkgs-25_11 {
+        system = pkgs.stdenv.hostPlatform.system;
+        config.allowUnfree = true;
+      };
+    })
   ];
 }
