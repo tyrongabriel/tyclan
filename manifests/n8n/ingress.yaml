@@ -14,7 +14,7 @@ spec:
           port: 80
           namespace: n8n
       middlewares:
-        - name: k3s-authentik-outpost
+        - name: k3s-kubernetes-outpost
           namespace: authentik # Replace with the actual namespace of your Authentik middleware
   tls:
     #certResolver: cloudflare-issuer # Use the cert resolver from your annotations
