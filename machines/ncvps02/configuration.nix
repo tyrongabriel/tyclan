@@ -48,6 +48,11 @@
   };
 
   networking.firewall.allowedTCPPorts = [ 80 ]; # For testing
+  # Machine is low powered, need my sudoer to be able to push nix store things
+  nix.settings.trusted-users = [
+    "root"
+    "tyron"
+  ];
 
   clan.core.settings.state-version.enable = true;
 }

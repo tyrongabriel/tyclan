@@ -44,6 +44,11 @@
             default = "root";
             description = "User to use for ssh";
           };
+          sshPort = lib.mkOption {
+            type = lib.types.port;
+            default = 22;
+            description = "Port to use for ssh";
+          };
           exitNode = lib.mkOption {
             type = lib.types.bool;
             default = false;
@@ -73,16 +78,20 @@
       {
 
         exports = mkExports {
-          peer.hosts = [
-            {
-              plain = clanLib.getPublicValue {
-                machine = machine.name;
-                generator = "${generatorName}-ip";
-                file = "tailscale-host";
-                flake = directory;
-              };
-            }
-          ];
+          peer = {
+            hosts = [
+              {
+                plain = clanLib.getPublicValue {
+                  machine = machine.name;
+                  generator = "${generatorName}-ip";
+                  file = "tailscale-ipv4";
+                  flake = directory;
+                };
+              }
+            ];
+            user = settings.sshUser;
+            port = settings.sshPort;
+          };
         };
 
         # exports.networking = {
@@ -113,6 +122,7 @@
               "enableSSH"
               "exitNode"
               "sshUser"
+              "sshPort"
             ];
 
             extraUpFlags =

@@ -2,12 +2,30 @@ _: {
   instances = {
     internet = {
       roles.default.machines = {
-        ncvps01.settings.host = "tyron@152.53.149.109";
-        ncvps02.settings.host = "tyron@159.195.9.89";
-        ltc01.settings.host = "tyron@192.168.8.10";
-        hp01.settings.host = "tyron@192.168.8.11";
-        yoga.settings.host = "tyron@localhost";
-        typc.settings.host = "tyron@192.168.1.138";
+        ncvps01.settings = {
+          host = "152.53.149.109";
+          user = "tyron";
+        };
+        ncvps02.settings = {
+          host = "159.195.9.89";
+          user = "tyron";
+        };
+        ltc01.settings = {
+          host = "192.168.8.10";
+          user = "tyron";
+        };
+        hp01.settings = {
+          host = "192.168.8.11";
+          user = "tyron";
+        };
+        yoga.settings = {
+          host = "localhost";
+          user = "tyron";
+        };
+        typc.settings = {
+          host = "192.168.1.138";
+          user = "tyron";
+        };
       };
     };
   };
