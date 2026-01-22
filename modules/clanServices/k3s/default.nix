@@ -33,7 +33,7 @@
         }:
         {
           nixosModule =
-            { config, ... }:
+            { config, pkgs, ... }:
             let
               machineIpPath = (
                 machineName:
@@ -83,13 +83,67 @@
                   map (server: "server ${server.name} ${server.ip}:${toString port} check") servers
                 )
               );
+              HAPROXY_ADMIN_USERNAME_PATH =
+                config.clan.core.vars.generators."haproxy-reds-${instanceName}".files.adminUsername.path;
+              HAPROXY_ADMIN_PASSWORD_PATH =
+                config.clan.core.vars.generators."haproxy-reds-${instanceName}".files.adminPassword.path;
 
+              getTailscaleIP = (
+                machineName:
+                if (builtins.pathExists (machineIpPath machineName)) then
+                  (builtins.readFile (machineIpPath machineName))
+                else
+                  ""
+              );
             in
             {
               networking.firewall.allowedTCPPorts = [
                 settings.haproxyApiPort # K3s API
                 8080 # Metrics
               ];
+
+              clan.core.vars.generators."haproxy-reds-${instanceName}" = {
+                prompts = {
+                  adminUsername = {
+                    type = "line";
+                    description = "The admin username for the haproxy stats page for ${instanceName}";
+                    persist = true;
+                  };
+                  adminPassword = {
+                    type = "hidden";
+                    description = "The admin password for the haproxy stats page for ${instanceName}";
+                    persist = true;
+                  };
+                };
+                files = {
+                  adminUsername.secret = true;
+                  adminPassword.secret = true;
+                };
+              };
+
+              systemd.services.haproxy.serviceConfig = {
+                # 1. Use '-' to tell systemd NOT to fail if the file is missing during initial load
+                EnvironmentFile = [ "-/run/haproxy/env" ];
+
+                # 2. Ensure /run/haproxy is created and managed by systemd
+                RuntimeDirectory = "haproxy";
+                RuntimeDirectoryMode = "0700";
+
+                # 3. Use '+' to run this specific command as root so it can read the secrets
+                ExecStartPre = [
+                  "+${pkgs.writeShellScript "haproxy-env-setup" ''
+                    # Create the environment file from the secrets
+                    # This runs as root, so it can read the clan secret files
+                    echo "HAPROXY_ADMIN_USERNAME=$(cat ${HAPROXY_ADMIN_USERNAME_PATH})" > /run/haproxy/env
+                    echo "HAPROXY_ADMIN_PASSWORD=$(cat ${HAPROXY_ADMIN_PASSWORD_PATH})" >> /run/haproxy/env # Add the password to the file
+
+                    # Set permissions so the haproxy user can read it, but no one else
+                    chmod 600 /run/haproxy/env
+                    chown haproxy:haproxy /run/haproxy/env
+                  ''}"
+                ];
+              };
+
               services.haproxy = {
                 enable = true;
                 config = ''
@@ -164,13 +218,12 @@
                       ${toString (generateBackendServersWithPort 443)}
 
                   listen stats
-                      bind *:8080
+                      bind ${getTailscaleIP machine.name}:8080
                       mode http
                       stats enable
                       stats uri /haproxy?stats
                       stats realm Haproxy\ Statistics
-                      # Set a username and password for access (optional but recommended)
-                      stats auth admin:securepassword
+                      stats auth "$HAPROXY_ADMIN_USERNAME":"$HAPROXY_ADMIN_PASSWORD" # Use the environment variables here.
                       stats refresh 10s
                 ''; # UPDATE TO USE SECRET FOR PASSWD!!
                 # Use the following command to get formatted config:
