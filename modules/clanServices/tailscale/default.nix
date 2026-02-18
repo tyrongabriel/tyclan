@@ -16,6 +16,10 @@
       "VPN"
     ];
     readme = builtins.readFile ./README.md;
+    exports.out = [
+      "networking"
+      "peer"
+    ];
   };
 
   # Ever since networking update
