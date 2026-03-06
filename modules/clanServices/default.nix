@@ -11,6 +11,8 @@ let
     "@tyclan/desktop" = ./desktop;
     "@tyclan/stylix" = ./stylix;
     "@tyclan/hytale-server" = ./hytale-server;
+    "@tyclan/ollama" = ./ollama;
+    "@tyclan/llama-cpp" = ./llama-cpp;
     #"module-name" = import ./module-name;
 
   };

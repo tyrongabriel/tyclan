@@ -15,6 +15,8 @@ let
     desktop = import ./desktop.nix { inherit inputs; };
     stylix = import ./stylix.nix { inherit inputs; };
     hytale-server = import ./hytale-server.nix { inherit inputs; };
+    ollama = import ./ollama.nix { inherit inputs; };
+    llama-cpp = import ./llama-cpp.nix { inherit inputs; };
   };
 in
 lib.foldr lib.recursiveUpdate { } (lib.attrValues services)

@@ -49,6 +49,14 @@
     # ];
   };
 
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-compute-runtime # OpenCL filter for Intel GPUs
+      intel-media-driver # VA-API for hardware video processing
+    ];
+  };
+
   # Set the default gateway
   # networking.defaultGateway = {
   #   address = "152.53.148.1";
