@@ -29,6 +29,18 @@ kubectl apply -f nginx-hello-world.yaml
 ```
 
 
+## Using helm
+```bash
+helm repo add tailscale https://pkgs.tailscale.com/helmcharts && helm repo update
+sops decrypt values.secret.yaml | helm upgrade \
+  --install \
+  tailscale-operator \
+  tailscale/tailscale-operator \
+  -f - \
+  --namespace=tailscale \
+  --create-namespace \
+  --wait
+```
 
 
 

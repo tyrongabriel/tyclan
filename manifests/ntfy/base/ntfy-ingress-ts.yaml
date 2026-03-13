@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ntfy-ingress-ts
+  annotations:
+    # Force the Tailscale node name to be exactly
+    tailscale.com/hostname: ntfy
+    # Explicitly set the backend protocol
+    tailscale.com/backend-protocol: "http"
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: ntfy
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ntfy-svc
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - ntfy

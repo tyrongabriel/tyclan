@@ -7,3 +7,7 @@ creation_rules:
     key_groups:
       - age:
           - *tyron_yoga
+  - path_regex: .*.secret.yml
+    key_groups:
+      - age:
+          - *tyron_yoga

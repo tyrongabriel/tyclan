@@ -24,6 +24,9 @@ spec:
   postgresql:
     parameters:
       max_connections: "100"
+      max_slot_wal_keep_size: "1GB"
+      max_wal_size: "2GB"
+      min_wal_size: "512MB"
 
   backup:
     # Volume snapshot backups

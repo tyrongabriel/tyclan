@@ -422,7 +422,16 @@
               environment.systemPackages = with pkgs; [
                 # Other packages...
                 openiscsi
+                util-linux # For longhorn to get fstrim
               ];
+              # Terrible fucking hack to get longhorn working with fstrim
+              system.activationScripts.longhorn-fstrim = {
+                text = ''
+                  mkdir -p /usr/bin
+                  ln -sfn /run/current-system/sw/bin/fstrim /usr/bin/fstrim
+                '';
+              };
+              #services.envfs.enable = true; # Links things (like fstrim) to /usr/bin
               # Fix for longhorn https://github.com/longhorn/longhorn/issues/2166#issuecomment-2994323945
               services.openiscsi = {
                 enable = true;
