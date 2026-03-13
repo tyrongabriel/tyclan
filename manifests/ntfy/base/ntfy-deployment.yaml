@@ -15,19 +15,37 @@ spec:
       labels:
         app: ntfy-pod
     spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "chmod -R 777 /var/cache/ntfy && ls -la /var/cache/ntfy",
+            ]
+          volumeMounts:
+            - mountPath: /var/cache/ntfy
+              name: cache-volume
       containers:
         - name: ntfy
-          image: binwiederhier/ntfy:v1.28.0 # set deployed version
+          image: binwiederhier/ntfy:v2.18 # set deployed version
           args: ["serve"]
           env: #example of adjustments made in environmental variables
-            - name: TZ # set timezone
-              value: XXXXXXX
-            - name: NTFY_DEBUG # enable/disable debug
-              value: "false"
-            - name: NTFY_LOG_LEVEL # adjust log level
+            - name: TZ
+              value: "Europe/Vienna"
+            # - name: NTFY_DEBUG
+            #   value: "true"
+            - name: NTFY_LOG_LEVEL
               value: INFO
-            - name: NTFY_BASE_URL # add base url
-              value: XXXXXXXXXX
+            - name: NTFY_BASE_URL
+              value: "https://ntfy.tyrongabriel.com"
+            # - name: NTFY_AUTH_FILE
+            #   value: "/var/cache/ntfy/user.db"
+            # # - name: NTFY_AUTH_DEFAULT_ACCESS
+            # #   value: "deny-all"
+            # - name: NTFY_CACHE_FILE
+            #   value: "/var/cache/ntfy/cache.db"
           ports:
             - containerPort: 80
               name: http-ntfy

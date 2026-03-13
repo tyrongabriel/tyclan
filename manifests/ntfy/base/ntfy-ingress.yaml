@@ -19,9 +19,9 @@ spec:
               httpOnly: true
               secure: true
               sameSite: none
-      middlewares:
-        - name: k3s-kubernetes-outpost
-          namespace: authentik # Replace with the actual namespace of your Authentik middleware
+      # middlewares:
+      #   - name: k3s-kubernetes-outpost
+      #     namespace: authentik # Replace with the actual namespace of your Authentik middleware
   tls:
     #certResolver: cloudflare-issuer # Use the cert resolver from your annotations
     domains:
