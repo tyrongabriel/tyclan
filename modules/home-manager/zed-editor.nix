@@ -55,6 +55,12 @@ in
 
       #https://zed.dev/docs/configuring-zed#direnv-integration
       userSettings = {
+        agent_servers = {
+          opencode = {
+            default_model = "opencode/gpt-5-nano/high";
+            type = "registry";
+          };
+        };
         load_direnv = "shell_hook";
         agent = {
           profiles = {
@@ -71,10 +77,11 @@ in
           };
           #version = "2";
           enabled = true;
-          default_profile = "none";
+          default_profile = "Minimal";
           default_model = {
-            provider = "Cerebras";
-            model = "zai-glm-4.6";
+            provider = "google";
+            model = "gemini-3-flash-preview";
+            enable-thinking = true;
           };
         };
 

@@ -1,0 +1,75 @@
+{
+  "title": "K3s Cluster Overview",
+  "uid": "k3s-overview",
+  "timezone": "browser",
+  "panels": [
+    {
+      "title": "Cluster CPU Usage",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+          "legendFormat": "CPU %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 85 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Cluster Memory Usage",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "(1 - sum(node_memory_MemAvailable_bytes) / sum(node_memory_MemTotal_bytes)) * 100",
+          "legendFormat": "Memory %"
+        }
+      ]
+    },
+    {
+      "title": "K3s API Server Request Rate",
+      "type": "graph",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(apiserver_request_total[5m])) by (verb)",
+          "legendFormat": "{{verb}}"
+        }
+      ]
+    },
+    {
+      "title": "Pod Count by Namespace",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "count(kube_pod_info) by (namespace)",
+          "legendFormat": "{{namespace}}"
+        }
+      ]
+    },
+    {
+      "title": "Node Disk Usage",
+      "type": "bargauge",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 8 },
+      "targets": [
+        {
+          "expr": "100 - ((node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"}) * 100)",
+          "legendFormat": "{{instance}}"
+        }
+      ]
+    }
+  ]
+}

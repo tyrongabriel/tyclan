@@ -27,7 +27,7 @@
           settings,
           roles,
           lib,
-          exports,
+          #exports,
           machine,
           ...
         }:
@@ -626,18 +626,18 @@
         };
       perInstance =
         {
-          instanceName,
-          settings,
-          machine,
-          roles,
+          # instanceName,
+          # settings,
+          # machine,
+          # roles,
           ...
         }:
         {
           nixosModule =
             {
-              config,
-              pkgs,
-              lib,
+              # config,
+              # pkgs,
+              # lib,
               ...
             }:
             {

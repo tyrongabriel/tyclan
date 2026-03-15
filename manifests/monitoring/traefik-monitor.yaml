@@ -1,0 +1,21 @@
+# traefik-servicemonitor.yaml
+# ServiceMonitor to scrape Traefik metrics in K3s
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: traefik
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: traefik
+  namespaceSelector:
+    matchNames:
+      - kube-system
+  endpoints:
+    - port: traefik
+      path: /metrics
+      interval: 30s
