@@ -1,5 +1,6 @@
 { pkgs, lib, ... }:
 {
+  clan.core.networking.buildHost = "local";
   environment.systemPackages = with pkgs; [
     btop
   ];

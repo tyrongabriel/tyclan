@@ -4,11 +4,12 @@ let
 
   services = {
     internet = import ./internet.nix { inherit inputs; };
-    zerotier = import ./zerotier.nix {
-      inherit inputs;
-      inherit lib;
-    };
-    k3s = import ./k3s.nix { inherit inputs; };
+    # zerotier = import ./zerotier.nix {
+    #   inherit inputs;
+    #   inherit lib;
+    # };
+    #k3s = import ./k3s.nix { inherit inputs; };
+    k3s-new = import ./k3s-new.nix { inherit inputs; };
     tailscale = import ./tailscale.nix { inherit inputs; };
     netbird = import ./netbird.nix { inherit inputs; };
     nixos-modules = import ./nixos-modules.nix { inherit inputs; };

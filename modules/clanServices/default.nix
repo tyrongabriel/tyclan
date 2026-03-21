@@ -5,6 +5,7 @@ let
   module_definitions = {
     "@tyclan/roster" = import ./roster;
     "@tyclan/k3s" = import ./k3s; # To give config access
+    "@tyclan/k3s-new" = import ./k3s-new; # To give config access
     "@tyclan/tailscale" = ./tailscale;
     "@tyclan/tailscale-traefik" = ./tailscale-traefik;
     "@tyclan/netbird" = ./netbird;

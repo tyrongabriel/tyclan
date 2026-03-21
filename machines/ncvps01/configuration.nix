@@ -35,6 +35,10 @@
         address = "2a00:11c0:47:195b::10"; # CHOOSE YOUR HOST ADDRESS in the subnet
         prefixLength = 64; # Your subnet's prefix length
       }
+      {
+        address = "fe80::d810:7aff:feca:8244";
+        prefixLength = 10;
+      }
     ];
   };
 
