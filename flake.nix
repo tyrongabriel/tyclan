@@ -22,6 +22,14 @@
       url = "github:danth/stylix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    authentik-nix = {
+      url = "github:nix-community/authentik-nix";
+
+      ## optional overrides. Note that using a different version of nixpkgs can cause issues, especially with python dependencies
+      # inputs.nixpkgs.follows = "nixpkgs"
+      # inputs.flake-parts.follows = "flake-parts"
+    };
   };
   outputs =
     inputs@{

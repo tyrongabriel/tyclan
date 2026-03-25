@@ -14,6 +14,7 @@ let
     "@tyclan/hytale-server" = ./hytale-server;
     "@tyclan/ollama" = ./ollama;
     "@tyclan/llama-cpp" = ./llama-cpp;
+    "@tyclan/authentik" = ./authentik;
     #"module-name" = import ./module-name;
 
   };

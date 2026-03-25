@@ -1,6 +1,19 @@
-{ pkgs, lib, ... }:
 {
-  clan.core.networking.buildHost = "local";
+  pkgs,
+  lib,
+  config,
+  ...
+}:
+{
+  clan.core.networking.buildHost = "tyron@[fd7a:115c:a1e0::6f01:867e]";
+  # programs.ssh.extraConfig = ''
+  #   Host builder
+  #     HostName [fd7a:115c:a1e0::6f01:867e]
+  #     User tyron
+  #     IdentityFile ${config.clan.core.vars.generators.remote-builder.files.ssh-private-key.path}
+  #     IdentitiesOnly yes
+  # '';
+
   environment.systemPackages = with pkgs; [
     btop
   ];

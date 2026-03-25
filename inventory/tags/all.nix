@@ -1,6 +1,22 @@
 { pkgs, lib, ... }:
 with lib;
 {
+  # clan.core.vars.generators."remote-builder" = {
+  #   files."privatekey" = {
+  #     secret = true;
+  #     mode = "0600";
+  #   };
+  #   files."publickey" = {
+  #     secret = false;
+  #   };
+  #   share = true;
+  #   runtimeInputs = [ pkgs.openssh ];
+  #   script = ''
+  #     ssh-keygen -t ed25519 -f "$out/privatekey" -N "" -C "remote-builder"
+  #     mv "$out/privatekey.pub" "$out/publickey"
+  #   '';
+  # };
+
   services.openssh = {
     enable = true;
     settings = {
@@ -8,6 +24,7 @@ with lib;
       PasswordAuthentication = false;
     };
     ports = [ 22 ];
+    #authorizedKeysFiles = [ clan.core.vars.generators."remote-builder".files.publickey.path ];
     openFirewall = true;
   };
 

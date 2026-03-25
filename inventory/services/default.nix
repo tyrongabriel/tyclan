@@ -15,6 +15,7 @@ let
     nixos-modules = import ./nixos-modules.nix { inherit inputs; };
     desktop = import ./desktop.nix { inherit inputs; };
     stylix = import ./stylix.nix { inherit inputs; };
+    authentik = import ./authentik.nix { inherit inputs; };
     #hytale-server = import ./hytale-server.nix { inherit inputs; };
     #ollama = import ./ollama.nix { inherit inputs; };
     #llama-cpp = import ./llama-cpp.nix { inherit inputs; };
